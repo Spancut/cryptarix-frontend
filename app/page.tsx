@@ -11,26 +11,46 @@ type Token = {
   alpha_score: number
 }
 
-export default function Home() {
+export default function Page() {
   const [tokens, setTokens] = useState<Token[]>([])
 
   useEffect(() => {
-    fetch(`${process.env.NEXT_PUBLIC_API_URL}/tokens`)
-      .then(res => res.json())
-      .then(data => setTokens(data))
-      .catch(err => console.error('API error:', err))
-  }, [])
+  fetch('https://cryptarix-api.onrender.com/tokens')
+    .then((res) => res.json())
+    .then((data) => {
+      console.log('Fetched tokens:', data)
+      setTokens(data)
+    })
+    .catch((err) => console.error('API error:', err))
+}, [])
 
   return (
-    <main className="p-8 space-y-4">
-      <h1 className="text-2xl font-bold">Token Dashboard</h1>
-      {tokens.map((token) => (
-        <div key={token.symbol} className="border p-4 rounded shadow">
-          <h2 className="text-xl font-semibold">{token.name} ({token.symbol})</h2>
-          <p>Price (USD): ${token.price_usd.toFixed(2)}</p>
-          <p>Alpha Score: {token.alpha_score.toFixed(2)}</p>
-        </div>
-      ))}
-    </main>
+    <div className="p-6">
+      <h1 className="text-2xl font-bold mb-4">Token Dashboard</h1>
+      {tokens.length === 0 ? (
+        <p>No tokens found.</p>
+      ) : (
+        <table className="min-w-full border">
+          <thead>
+            <tr>
+              <th className="border px-4 py-2">Symbol</th>
+              <th className="border px-4 py-2">Name</th>
+              <th className="border px-4 py-2">Price (USD)</th>
+              <th className="border px-4 py-2">Alpha Score</th>
+            </tr>
+          </thead>
+          <tbody>
+            {tokens.map((token) => (
+              <tr key={token.symbol}>
+                <td className="border px-4 py-2">{token.symbol}</td>
+                <td className="border px-4 py-2">{token.name}</td>
+                <td className="border px-4 py-2">${token.price_usd.toLocaleString()}</td>
+                <td className="border px-4 py-2">{token.alpha_score.toFixed(2)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+    </div>
   )
 }
